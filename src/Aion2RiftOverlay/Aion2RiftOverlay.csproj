@@ -16,9 +16,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Allows the test project to test internal helpers. -->
+    <InternalsVisibleTo Include="Aion2RiftOverlay.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Voice alert sounds are embedded in the exe and extracted to
-         %LOCALAPPDATA%\Aion2RiftOverlay\sounds on first run, so the
-         published exe is fully self-contained. -->
+         %LOCALAPPDATA%\Aion2RiftOverlay\sounds on startup (always overwritten),
+         so the published exe is fully self-contained.
+         Users can override the sounds WITHOUT recompiling by dropping MP3/WAV
+         files with the same names into a "sounds" folder next to the exe. -->
     <EmbeddedResource Include="Sounds\10minutes.mp3" />
     <EmbeddedResource Include="Sounds\OpenNow.mp3" />
   </ItemGroup>

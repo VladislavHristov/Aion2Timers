@@ -10,15 +10,24 @@ namespace Aion2RiftOverlay.Services;
 /// Fire-and-forget voice/sound alert playback using WPF MediaPlayer
 /// (supports WAV and MP3). Missing or unreadable files are ignored silently;
 /// playback must never crash the overlay.
-/// Also extracts the embedded default alert sounds to the user's local
-/// application-data folder on first run, so a single published exe carries
-/// everything needed for voice alerts.
+///
+/// Sound file resolution priority (highest first, see MainViewModel.ResolveSoundFile):
+///   1. Path configured in settings.json
+///   2. <see cref="OverridesDirectory"/> - a "sounds" folder next to the exe
+///      (lets anyone swap voices without recompiling)
+///   3. <see cref="SoundsDirectory"/> - embedded defaults extracted to
+///      %LOCALAPPDATA%\Aion2RiftOverlay\sounds (always re-extracted on startup,
+///      so repo-built exes always play the sounds bundled in the build)
 /// </summary>
 public sealed class SoundAlertService
 {
+    /// <summary>App-managed default sounds, extracted from embedded resources.</summary>
     public static readonly string SoundsDirectory = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "Aion2RiftOverlay", "sounds");
+
+    /// <summary>User overrides: a "sounds" folder next to the exe (best-effort).</summary>
+    public static string OverridesDirectory => Path.Combine(AppContext.BaseDirectory, "sounds");
 
     private static readonly string[] EmbeddedSoundResources =
     {
@@ -32,26 +41,43 @@ public sealed class SoundAlertService
     private readonly object _gate = new();
 
     /// <summary>
-    /// Writes the embedded MP3 files to <see cref="SoundsDirectory"/> unless they
-    /// already exist. Safe to call on every startup. Never throws.
+    /// Creates the user-override folder (best effort, so it is easy to discover)
+    /// and writes the embedded MP3 files to <see cref="SoundsDirectory"/>,
+    /// overwriting previous extractions. Safe to call on every startup; never throws.
     /// </summary>
     public void ExtractDefaultSounds()
     {
         try
         {
             Directory.CreateDirectory(SoundsDirectory);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+        {
+            return;
+        }
+
+        try
+        {
+            // Discoverable "sounds" folder next to the exe for user overrides.
+            Directory.CreateDirectory(OverridesDirectory);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+        {
+            // Read-only install location: overrides folder is simply unavailable.
+        }
+
+        try
+        {
             var assembly = Assembly.GetExecutingAssembly();
 
             foreach (var fileName in EmbeddedSoundResources)
             {
                 var target = Path.Combine(SoundsDirectory, fileName);
-                if (File.Exists(target))
-                {
-                    continue;
-                }
 
-                var resourceName = $"Aion2RiftOverlay.Sounds.{fileName}";
-                using var stream = assembly.GetManifestResourceStream(resourceName);
+                // Always overwrite: the embedded sounds belong to the build that
+                // is running, so a repo user who swapped Sounds\*.mp3 and rebuilt
+                // hears the new files, not stale extractions.
+                using var stream = assembly.GetManifestResourceStream($"Aion2RiftOverlay.Sounds.{fileName}");
                 if (stream is null)
                 {
                     continue; // resource not embedded; alerts simply stay silent

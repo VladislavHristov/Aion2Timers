@@ -115,6 +115,25 @@ Distribution notes:
 - **Settings (S button):**
   - *Opacity* slider: 20-100 %, default 85 %. Applies to the translucent
     backdrop; the countdown text is always fully opaque for readability.
+- Tray icon: double-click shows the overlay; right-click offers *Show overlay*
+  and *Exit*.
+
+## Custom voice sounds (no recompile needed)
+
+Sound files are resolved in this priority order:
+
+1. **settings.json** - full paths in `tenMinuteWarningFile` / `openingSoundFile`
+   (`%LOCALAPPDATA%\Aion2RiftOverlay\settings.json`), used only if the file exists.
+2. **`sounds` folder next to the exe** - create `sounds\` beside
+   `Aion2RiftOverlay.exe` and drop `10minutes.mp3` / `OpenNow.mp3` (or your own
+   WAV/MP3 files with those names). This folder is created automatically on
+   first launch and is the easiest way to swap voices - perfect for a compiled
+   exe from a GitHub release.
+3. **Embedded defaults** - the sounds bundled in `src/Aion2RiftOverlay/Sounds/`
+   are compiled INTO the exe and extracted (overwritten) to
+   `%LOCALAPPDATA%\Aion2RiftOverlay\sounds` on every startup. If you clone this
+   repo, replace the MP3s in that folder and rebuild, your new voices are baked
+   into the exe.
   - *Always on top* - default on.
   - *Lock position* - disables dragging.
   - *Minimize to system tray* - the minimize button then hides the window to

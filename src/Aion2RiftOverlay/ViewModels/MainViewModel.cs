@@ -143,6 +143,14 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Sound file for the 10-minute warning voice clip.</summary>
+    public string TenMinuteSoundFile
+        => ResolveSoundFile(_settings.TenMinuteWarningFile, "10minutes.mp3", SoundAlertService.OverridesDirectory, SoundAlertService.SoundsDirectory);
+
+    /// <summary>Sound file played when a rift opens.</summary>
+    public string OpeningSoundFile
+        => ResolveSoundFile(_settings.OpeningSoundFile, "OpenNow.mp3", SoundAlertService.OverridesDirectory, SoundAlertService.SoundsDirectory);
+
     /// <summary>Saved window position, if a valid one exists.</summary>
     public bool TryGetSavedPosition(out double x, out double y)
     {
@@ -168,12 +176,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public void SaveSettings() => _settingsService.Save(_settings);
 
-    /// <summary>Sound file for the 10-minute warning voice clip.</summary>
-    public string TenMinuteSoundFile => ResolveSoundFile(_settings.TenMinuteWarningFile, "10minutes.mp3");
-
-    /// <summary>Sound file played when a rift opens.</summary>
-    public string OpeningSoundFile => ResolveSoundFile(_settings.OpeningSoundFile, "OpenNow.mp3");
-
     /// <summary>
     /// Recomputes the countdown and labels from the current instant. Called once
     /// per second by the UI timer, which also covers system sleep/resume and
@@ -191,7 +193,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         NextOpeningText = localNext.ToString("HH:mm");
 
         var isSummer = _schedule.IsSummerSchedule(localNext.Date);
-        StatusText = isSummer ? "EEST · SUMMER" : "EET · WINTER";
+        StatusText = isSummer ? "EEST - SUMMER" : "EET - WINTER";
 
         EvaluateAlerts(now, next);
     }
@@ -200,7 +202,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     /// Voice-alert state machine, evaluated on every refresh:
     /// - when the opening we are counting down to arrives, fire the opening alert;
     /// - re-arm for the next scheduled opening;
-    /// - fire the 10-minute warning once per opening when remaining &lt;= 10 min.
+    /// - fire the 10-minute warning once per opening when remaining <= 10 min.
     /// Sleep/resume safe: everything is derived from the current instant.
     /// </summary>
     internal void EvaluateAlerts(DateTimeOffset now, DateTimeOffset nextOpening)
@@ -241,21 +243,31 @@ public sealed class MainViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Returns the configured sound path, or the default file under
-    /// %LOCALAPPDATA%\Aion2RiftOverlay\sounds when nothing is configured.
+    /// Sound resolution priority (highest first):
+    ///   1. Path configured in settings.json (only if the file still exists)
+    ///   2. "sounds" folder next to the exe - user overrides, no recompile needed
+    ///   3. Embedded defaults extracted to %LOCALAPPDATA%\Aion2RiftOverlay\sounds
+    /// Returns an empty string when nothing exists, so alerts stay silent.
     /// </summary>
-    private static string ResolveSoundFile(string configured, string defaultFileName)
+    internal static string ResolveSoundFile(
+        string configured,
+        string defaultFileName,
+        string overrideDirectory,
+        string fallbackDirectory)
     {
-        if (!string.IsNullOrWhiteSpace(configured))
+        if (!string.IsNullOrWhiteSpace(configured) && File.Exists(configured))
         {
             return configured;
         }
 
-        var fallback = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Aion2RiftOverlay", "sounds", defaultFileName);
+        var overridePath = Path.Combine(overrideDirectory, defaultFileName);
+        if (File.Exists(overridePath))
+        {
+            return overridePath;
+        }
 
-        return File.Exists(fallback) ? fallback : string.Empty;
+        var fallbackPath = Path.Combine(fallbackDirectory, defaultFileName);
+        return File.Exists(fallbackPath) ? fallbackPath : string.Empty;
     }
 
     private void SaveAndNotify(string propertyName)
