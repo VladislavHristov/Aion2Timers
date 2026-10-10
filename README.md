@@ -1,23 +1,34 @@
-# AION 2 Space Rift Overlay
+﻿# AION 2 Space Rift Overlay
 
 A small, dark, translucent floating countdown overlay for **AION 2** "Space Rift"
 openings in Sofia time. Standalone WPF desktop app - it does **not** inject into
 the game, read game memory, modify game files, or automate gameplay.
 
-```
-+------------------------------+
-| AION II            . EEST  S _|
-| SPACE RIFT                   |
-|         02:14:38             |
-| NEXT OPENING           15:00 |
-+------------------------------+
-```
-
-- Header: `AION II`, schedule status (EEST/EET), settings button, minimize button
+- Header: `Aion2 x Sxystar`, schedule status (EEST/EET), settings button, minimize button
 - Large cyan countdown in `HH:MM:SS`, updated once per second
-- `NEXT OPENING` - next opening in local Sofia time (`HH:mm`)
+- ``NEXT OPENING`` - next opening in local Sofia time (``HH:mm``)
+- Mini overlays for **Daily Reset** (07:00 UTC) and **Weekly Reset** (Wednesday 07:00 UTC), toggled from the settings panel
+- Voice alerts: a clip 10 minutes before each opening and one at the opening
 - Click the settings button (S) to open the settings panel
 - Dark translucent backdrop with rounded corners; text stays fully opaque
+
+## Screenshots
+
+All three overlays as they appear in game:
+
+![All overlays](docs/screenshots/overlays.png)
+
+
+Space Rift countdown overlay:
+
+![Space Rift overlay](docs/screenshots/spacerift.png)
+
+Mini overlays for the Daily and Weekly Reset (enabled from the settings panel):
+
+![Daily Reset overlay](docs/screenshots/daily-reset.png)
+![Weekly Reset overlay](docs/screenshots/weekly-reset.png)
+
+*The translucent backdrop shows the desktop behind it; the countdown text stays fully opaque.*
 
 ## Requirements
 
@@ -75,39 +86,52 @@ Or open the folder in VS Code, open `MainWindow.xaml` / any `.cs` file, and
 launch the command above in a terminal. Stop it with the settings panel's
 **CLOSE APP** button or the tray icon's **Exit** item.
 
-## Publish a standalone executable
+## Making your own .exe (from this repo)
 
-One command:
+Anyone can build the standalone exe in three steps:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File i:\Aion2RiftOverlay\publish.ps1
-```
-
-or manually:
+**1. Get the code** - clone it, or use the green *Code > Download ZIP* button on GitHub:
 
 ```powershell
-i:\Aion2RiftOverlay\.dotnet\dotnet.exe publish i:\Aion2RiftOverlay\src\Aion2RiftOverlay\Aion2RiftOverlay.csproj `
-  -c Release -r win-x64 --self-contained true `
-  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=none `
-  -o i:\Aion2RiftOverlay\publish
+git clone https://github.com/VladislavHristov/Aion2Timers.git
+cd Aion2Timers
 ```
 
-Output: `i:\Aion2RiftOverlay\publish\Aion2RiftOverlay.exe` - a **self-contained,
-single-file, Windows x64** executable (~70-100 MB) that bundles the .NET 8
-runtime. Target machines need **no** .NET Desktop Runtime, VS Code, or Cline.
+**2. Install the .NET 8 SDK** (skip if you have it - check with `dotnet --list-sdks`):
 
-Distribution notes:
+```powershell
+# Option A - system-wide (winget):
+winget install Microsoft.DotNet.SDK.8
 
-- Copy the single `.exe` from the `publish` folder to any **Windows 10 (build
-  1903+) / Windows 11 x64** machine. WPF's native libraries are embedded in the
-  exe (`IncludeNativeLibrariesForSelfExtract`), so no DLLs ship beside it.
-- Settings are always written to the user's `%LOCALAPPDATA%`, never beside the exe.
-- Self-contained publishing bundles the runtime but does **not** guarantee
-  compatibility with every Windows version or configuration.
-- The overlay's visibility **over the game** depends on AION 2's display mode
-  (Borderless Windowed works best) and Windows composition behavior. Visibility
-  in exclusive fullscreen cannot be guaranteed, and behavior in the actual game
-  has not been tested - do not assume it until verified in game.
+# Option B - portable, no admin required (repo helper script):
+powershell -ExecutionPolicy Bypass -File .\dotnet-install.ps1 -Channel 8.0 -InstallDir .\.dotnet
+```
+
+If you used Option B, replace `dotnet` with `./.dotnet/dotnet.exe` in the commands below.
+
+**3. Publish** - one command builds a self-contained single-file exe (no .NET Desktop
+Runtime is needed on the PC where it will run):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\publish.ps1
+```
+
+Result: **`publish\Aion2RiftOverlay.exe`** - a single ~154 MB file you can copy to any
+Windows 10/11 x64 machine. The voice-alert sounds are already embedded in it and are
+extracted automatically on first launch (see *Custom voice sounds* below for how to
+swap them).
+
+Optional - run the test suite before publishing:
+
+```powershell
+dotnet test tests\Aion2RiftOverlay.Tests\Aion2RiftOverlay.Tests.csproj
+```
+
+Manual publish command (same thing the script does, useful in CI):
+
+```powershell
+dotnet publish src\Aion2RiftOverlay\Aion2RiftOverlay.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=none -o publish
+```
 
 ## Usage
 
@@ -172,4 +196,10 @@ src/Aion2RiftOverlay/            WPF app (net8.0-windows)
 tests/Aion2RiftOverlay.Tests/    xUnit tests (schedule + settings)
 publish.ps1                      one-command release build
 ```
+
+
+
+
+
+
 
