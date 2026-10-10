@@ -21,6 +21,15 @@
 - SoundAlertService: WPF MediaPlayer fire-and-forget; never throws.
 - SettingsService: JSON (camelCase, indented), atomic write (tmp + Move overwrite),
   malformed → safe defaults; AppSettings.Sanitize() clamps values.
+- ResetScheduleService: daily 07:00 UTC, weekly Wednesday 07:00 UTC; instants UTC,
+  displayed via a settable DisplayTimeZone (sofia by default). Same "strictly later"
+  policy as the rift schedule.
+- TimeZoneService: user-selectable DISPLAY zone. Schedule INSTANTS always Sofia/
+  UTC-based; only presentation converts. Resolve(id) falls back to Sofia on
+  empty/unknown id. AppSettings.DisplayTimeZoneId persists the choice.
+- MainViewModel.SelectedTimeZone (ComboBox bound to TimeZoneOptions): sets
+  DisplayTimeZone, saves, Refresh(); ResetWindow listens for PropertyChanged and
+  forwards to ResetViewModel.SetDisplayTimeZone → instant sync of mini overlays.
 
 ## Alert State Machine (in MainViewModel.EvaluateAlerts)
 - _armedOpening = opening being counted down; _warnedFor = opening that got its warning.

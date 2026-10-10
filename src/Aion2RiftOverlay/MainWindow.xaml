@@ -180,7 +180,23 @@
                               ToolTip="Small overlay counting down to the daily reset (07:00 UTC)."/>
                     <CheckBox Style="{StaticResource PanelCheck}" Content="Show Weekly Reset overlay"
                               IsChecked="{Binding ShowWeeklyResetOverlay, Mode=TwoWay}"
-                              ToolTip="Small overlay counting down to the weekly reset (Wednesday 07:00 UTC)."/>                    <Grid Margin="0,10,0,0">
+                              ToolTip="Small overlay counting down to the weekly reset (Wednesday 07:00 UTC)."/>
+
+                    <Grid Margin="0,6,0,0">
+                        <TextBlock Text="TIME ZONE (display)" FontSize="9" FontWeight="SemiBold"
+                                   Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center"/>
+                    </Grid>
+                    <ComboBox x:Name="TimeZoneCombo"
+                              Margin="0,4,0,0"
+                              Height="22"
+                              FontSize="11"
+                              Background="#142D9CDB"
+                              Foreground="#C6D4E2"
+                              ItemsSource="{Binding TimeZoneOptions}"
+                              SelectedItem="{Binding SelectedTimeZone, Mode=TwoWay}"
+                              DisplayMemberPath="DisplayName"
+                              ToolTip="Time zone used to DISPLAY the countdown times. The rift schedule itself is always Sofia time; reset times are 07:00 UTC."/>
+                    <Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>

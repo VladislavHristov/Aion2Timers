@@ -25,10 +25,10 @@ public sealed class ResetViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public ResetViewModel(ResetKind kind, ResetScheduleService? schedule = null)
+    public ResetViewModel(ResetKind kind, ResetScheduleService? schedule = null, TimeZoneInfo? displayTimeZone = null)
     {
         _kind = kind;
-        _schedule = schedule ?? new ResetScheduleService();
+        _schedule = schedule ?? new ResetScheduleService(displayTimeZone: displayTimeZone);
         Refresh();
     }
 
@@ -52,7 +52,14 @@ public sealed class ResetViewModel : INotifyPropertyChanged
             ? $"{remaining.Days}d {remaining.Hours:00}:{remaining.Minutes:00}:{remaining.Seconds:00}"
             : remaining.ToString(@"hh\:mm\:ss");
 
-        NextResetText = _schedule.FormatSofia(next, _kind == ResetKind.Weekly);
+        NextResetText = _schedule.FormatLocal(next, _kind == ResetKind.Weekly);
+    }
+
+    /// <summary>Applies a new display zone (chosen in the main settings panel).</summary>
+    public void SetDisplayTimeZone(TimeZoneInfo displayTimeZone)
+    {
+        _schedule.DisplayTimeZone = displayTimeZone;
+        Refresh();
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

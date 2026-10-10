@@ -129,31 +129,31 @@ public class ResetScheduleServiceTests
         }
     }
 
-    // --- Sofia display conversion ---
+    // --- Display conversion (Sofia by default) ---
 
     [Fact]
-    public void FormatSofia_Summer_ShowsTenOclock()
+    public void FormatLocal_Summer_ShowsTenOclock()
     {
         var service = CreateService(Utc(2025, 7, 15, 0, 0));
-        var formatted = service.FormatSofia(Utc(2025, 7, 15, 7, 0, 0), includeWeekday: false);
+        var formatted = service.FormatLocal(Utc(2025, 7, 15, 7, 0, 0), includeWeekday: false);
 
         Assert.Equal("10:00", formatted); // EEST, UTC+3
     }
 
     [Fact]
-    public void FormatSofia_Winter_ShowsNineOclock()
+    public void FormatLocal_Winter_ShowsNineOclock()
     {
         var service = CreateService(Utc(2025, 1, 15, 0, 0));
-        var formatted = service.FormatSofia(Utc(2025, 1, 15, 7, 0, 0), includeWeekday: false);
+        var formatted = service.FormatLocal(Utc(2025, 1, 15, 7, 0, 0), includeWeekday: false);
 
         Assert.Equal("09:00", formatted); // EET, UTC+2
     }
 
     [Fact]
-    public void FormatSofia_Weekly_IncludesWeekday()
+    public void FormatLocal_Weekly_IncludesWeekday()
     {
         var service = CreateService(Utc(2025, 7, 15, 0, 0));
-        var formatted = service.FormatSofia(Utc(2025, 7, 16, 7, 0, 0), includeWeekday: true);
+        var formatted = service.FormatLocal(Utc(2025, 7, 16, 7, 0, 0), includeWeekday: true);
 
         Assert.Equal("Wed 10:00", formatted);
     }
@@ -168,6 +168,6 @@ public class ResetScheduleServiceTests
         var next = CreateService(now).GetNextWeeklyReset(now);
 
         Assert.Equal(Utc(2025, 10, 29, 7, 0, 0), next);
-        Assert.Equal("09:00", CreateService(now).FormatSofia(next, includeWeekday: false));
+        Assert.Equal("09:00", CreateService(now).FormatLocal(next, includeWeekday: false));
     }
 }

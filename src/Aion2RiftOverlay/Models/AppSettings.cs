@@ -44,6 +44,9 @@ public sealed class AppSettings
 
     /// <summary>Sound file for the opening alert. Empty = bundled default path.</summary>
     public string OpeningSoundFile { get; set; } = string.Empty;
+    /// <summary>Id of the time zone used to DISPLAY schedule times. Empty = Sofia (default).</summary>
+    public string DisplayTimeZoneId { get; set; } = string.Empty;
+
     /// <summary>Show the Daily Reset overlay window.</summary>
     public bool ShowDailyResetOverlay { get; set; } = true;
 
@@ -82,6 +85,8 @@ public sealed class AppSettings
         }
     }
 }
+
+
 
 
 

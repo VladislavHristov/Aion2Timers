@@ -1,7 +1,7 @@
 ﻿# Active Context: Aion2Timers (AION 2 Space Rift Overlay)
 
 ## Current State (2026-10-10)
-Application COMPLETE, built, tested (58/58), published, running, pushed to GitHub:
+Application COMPLETE, built, tested (68/68), published, running, pushed to GitHub:
 https://github.com/VladislavHristov/Aion2Timers (branch main).
 
 ## Recently Completed
@@ -21,6 +21,17 @@ https://github.com/VladislavHristov/Aion2Timers (branch main).
    - Checkboxes "Show Daily/Weekly Reset overlay" in main settings panel.
 5. Compact sizes: main Space Rift overlay 300->250px wide (fonts/margins reduced,
    EstimatedHeight 158); reset windows mini (132px, EstimatedHeight 78).
+6. README for repo visitors: real screenshots (capture-screens.ps1 captures the
+   running app; make-hero-shot.ps1 stacks them into docs/screenshots/overlays.png
+   hero image); "Making your own .exe (from this repo)" section (clone, SDK via
+   winget or dotnet-install.ps1, publish.ps1).
+7. Display TIME ZONE selector (user request, for non-Bulgarian users):
+   - ComboBox "TIME ZONE (display)" in main settings panel (all OS zones).
+   - Schedule instants stay Sofia/UTC-based; only display converts
+     (TimeZoneService.Resolve; AppSettings.DisplayTimeZoneId persisted).
+   - Reset mini overlays sync the zone live from the main view model.
+   - New TimeZoneSelectionTests; total tests 58 -> 68, all passing.
+   - Re-published self-contained exe (146.5 MB, runtime-verified).
 
 ## Standing User Rules
 - Commit / push / update memory bank ONLY on explicit user request (as done here).
@@ -29,3 +40,4 @@ https://github.com/VladislavHristov/Aion2Timers (branch main).
 ## Potential Next Steps
 - Volume control / alert test button; GitHub Actions release workflow;
   in-game visibility verification (user must test); code signing.
+

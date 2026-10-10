@@ -29,7 +29,7 @@ public partial class ResetWindow : Window
     {
         _kind = kind;
         _main = main;
-        _vm = new ResetViewModel(kind);
+        _vm = new ResetViewModel(kind, displayTimeZone: main.DisplayTimeZone);
         _positionTag = kind == ResetKind.Daily ? "Daily" : "Weekly";
 
         InitializeComponent();
@@ -135,6 +135,10 @@ public partial class ResetWindow : Window
         if (e.PropertyName == nameof(MainViewModel.OpacityPercent))
         {
             ApplyBackdropOpacity();
+        }
+        else if (e.PropertyName == nameof(MainViewModel.SelectedTimeZone))
+        {
+            _vm.SetDisplayTimeZone(_main.SelectedTimeZone);
         }
         else if (e.PropertyName == nameof(MainViewModel.IsTopMost))
         {

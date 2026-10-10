@@ -13,23 +13,29 @@ namespace Aion2RiftOverlay.Services;
 ///
 /// Policy matches RiftScheduleService: a reset exactly at the current instant
 /// counts as the current one; the next strictly later reset is returned.
-/// Instants are computed in UTC and only DISPLAYED converted to Sofia time.
+/// Instants are computed in UTC and only DISPLAYED in the user-chosen display
+/// zone (Sofia by default).
 /// </summary>
 public sealed class ResetScheduleService
 {
     public static readonly TimeSpan ResetUtcTime = new(7, 0, 0);
     public const DayOfWeek WeeklyResetDay = DayOfWeek.Wednesday;
 
-    private readonly TimeZoneInfo _sofiaTimeZone;
-    private readonly Func<DateTimeOffset> _clock;
+    private Func<DateTimeOffset> _clock;
+    private TimeZoneInfo _displayTimeZone;
 
-    public ResetScheduleService(Func<DateTimeOffset>? clock = null, TimeZoneInfo? sofiaTimeZone = null)
+    public ResetScheduleService(Func<DateTimeOffset>? clock = null, TimeZoneInfo? displayTimeZone = null)
     {
         _clock = clock ?? (() => DateTimeOffset.UtcNow);
-        _sofiaTimeZone = sofiaTimeZone ?? RiftScheduleService.ResolveSofiaTimeZone();
+        _displayTimeZone = displayTimeZone ?? RiftScheduleService.ResolveSofiaTimeZone();
     }
 
-    public TimeZoneInfo SofiaTimeZone => _sofiaTimeZone;
+    /// <summary>Zone used only for formatting the displayed reset times.</summary>
+    public TimeZoneInfo DisplayTimeZone
+    {
+        get => _displayTimeZone;
+        set => _displayTimeZone = value ?? RiftScheduleService.ResolveSofiaTimeZone();
+    }
 
     /// <summary>Current instant from the injectable clock.</summary>
     public DateTimeOffset CurrentInstant => _clock();
@@ -63,12 +69,12 @@ public sealed class ResetScheduleService
     }
 
     /// <summary>
-    /// Formats a reset instant in Sofia local time; the weekly variant includes
-    /// the weekday abbreviation (e.g. "Wed 10:00").
+    /// Formats a reset instant in the display time zone; the weekly variant
+    /// includes the weekday abbreviation (e.g. "Wed 10:00").
     /// </summary>
-    public string FormatSofia(DateTimeOffset resetUtc, bool includeWeekday)
+    public string FormatLocal(DateTimeOffset resetUtc, bool includeWeekday)
     {
-        var local = TimeZoneInfo.ConvertTime(resetUtc, _sofiaTimeZone);
+        var local = TimeZoneInfo.ConvertTime(resetUtc, _displayTimeZone);
         return includeWeekday ? local.ToString("ddd HH:mm", CultureInfo.InvariantCulture) : local.ToString("HH:mm", CultureInfo.InvariantCulture);
     }
 

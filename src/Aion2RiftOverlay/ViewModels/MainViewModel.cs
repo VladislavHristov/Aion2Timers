@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -60,6 +61,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _schedule = schedule ?? new RiftScheduleService();
         _settingsService = settingsService ?? new SettingsService();
         _settings = _settingsService.Load();
+        DisplayTimeZone = TimeZoneService.Resolve(_settings.DisplayTimeZoneId);
 
         ToggleSettingsCommand = new RelayCommand(() => SettingsPanelOpen = !SettingsPanelOpen);
         ResetPositionCommand = new RelayCommand(() => RequestResetPosition?.Invoke(this, EventArgs.Empty));
@@ -189,10 +191,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
         var seconds = Math.Max(0, (long)Math.Floor(remaining.TotalSeconds));
         CountdownText = TimeSpan.FromSeconds(seconds).ToString(@"hh\:mm\:ss");
 
-        var localNext = TimeZoneInfo.ConvertTime(next, _schedule.SofiaTimeZone);
-        NextOpeningText = localNext.ToString("HH:mm");
+        var sofiaNext = TimeZoneInfo.ConvertTime(next, _schedule.SofiaTimeZone);
+        NextOpeningText = TimeZoneInfo.ConvertTime(next, DisplayTimeZone).ToString("HH:mm");
 
-        var isSummer = _schedule.IsSummerSchedule(localNext.Date);
+        var isSummer = _schedule.IsSummerSchedule(sofiaNext.Date);
         StatusText = isSummer ? "EEST - SUMMER" : "EET - WINTER";
 
         EvaluateAlerts(now, next);
@@ -340,6 +342,31 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
         SaveSettings();
     }
+    // ---- Display time zone (user-selectable) -------------------------------
+
+    /// <summary>All time zones known to the OS, for the settings ComboBox.</summary>
+    public IReadOnlyCollection<TimeZoneInfo> TimeZoneOptions { get; } = TimeZoneInfo.GetSystemTimeZones();
+
+    /// <summary>Zone used only for DISPLAYING schedule times (Sofia by default).</summary>
+    public TimeZoneInfo DisplayTimeZone { get; private set; }
+
+    /// <summary>ComboBox-selected zone; persists its id and refreshes the display.</summary>
+    public TimeZoneInfo SelectedTimeZone
+    {
+        get => DisplayTimeZone;
+        set
+        {
+            if (value is null || Equals(value, DisplayTimeZone))
+            {
+                return;
+            }
+
+            DisplayTimeZone = value;
+            _settings.DisplayTimeZoneId = value.Id;
+            SaveAndNotify(nameof(SelectedTimeZone));
+            Refresh();
+        }
+    }
     private void SaveAndNotify(string propertyName)
     {
         SaveSettings();
@@ -360,4 +387,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
     }
 }
+
+
+
 

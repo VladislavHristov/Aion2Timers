@@ -8,13 +8,20 @@
       weekly), mini style (132px, "Aion2" header), own positions, synced opacity/topmost,
       show/hide checkboxes in main settings panel
 - [x] Main overlay compacted to 250px width
+- [x] README: real screenshots (capture-screens.ps1, make-hero-shot.ps1 -> docs/
+      screenshots/overlays.png hero + three individual shots), "Making your own .exe"
+      section for repo visitors
+- [x] Display TIME ZONE selector (ComboBox in settings; instants stay Sofia/UTC,
+      only display converts; persisted in settings.json; reset overlays sync live;
+      TimeZoneService + TimeZoneSelectionTests)
 - [x] GitHub repo https://github.com/VladislavHristov/Aion2Timers (branch main)
 
 ## Test Results
-- Latest run: 58/58 PASSED (build exit 0, publish exit 0)
+- Latest run: 68/68 PASSED (build exit 0, publish exit 0)
 
 ## NOT DONE / OPEN
 - [ ] In-game visibility over AION 2 NOT verified (user must test in Borderless Windowed)
 - [ ] No volume control / alert test button
 - [ ] exe unsigned (SmartScreen on first run)
 - [ ] No GitHub Actions release workflow (offered)
+
