@@ -1,0 +1,16 @@
+# Build output
+bin/
+obj/
+publish/
+
+# Local (workspace) .NET SDK used for building; not part of the source tree
+.dotnet/
+
+# Temporary tooling output
+.sdk.txt
+.icon.txt
+.sln.log
+sdk-install.log
+*.user
+.vs/
+.git.txt

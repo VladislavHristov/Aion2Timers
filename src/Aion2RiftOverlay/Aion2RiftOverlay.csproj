@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!-- Windows Forms is enabled only for NotifyIcon (system tray) and Screen (work-area clamping). -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Aion2RiftOverlay</RootNamespace>
+    <AssemblyName>Aion2RiftOverlay</AssemblyName>
+    <Version>1.0.0</Version>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Voice alert sounds are embedded in the exe and extracted to
+         %LOCALAPPDATA%\Aion2RiftOverlay\sounds on first run, so the
+         published exe is fully self-contained. -->
+    <EmbeddedResource Include="Sounds\10minutes.mp3" />
+    <EmbeddedResource Include="Sounds\OpenNow.mp3" />
+  </ItemGroup>
+
+</Project>
