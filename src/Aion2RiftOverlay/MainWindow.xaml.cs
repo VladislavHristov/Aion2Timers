@@ -16,12 +16,14 @@ namespace Aion2RiftOverlay;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private const double EstimatedHeight = 180; // used for pre-layout clamping
+    private const double EstimatedHeight = 158; // used for pre-layout clamping
 
     private readonly MainViewModel _vm;
     private readonly DispatcherTimer _uiTimer;
     private readonly DispatcherTimer _positionSaveTimer;
     private readonly Forms.NotifyIcon _notifyIcon;
+    private ResetWindow? _dailyResetWindow;
+    private ResetWindow? _weeklyResetWindow;
     private bool _positionRestored;
     private readonly Services.SoundAlertService _soundAlerts = new Services.SoundAlertService();
 
@@ -58,7 +60,7 @@ public partial class MainWindow : Window
 
         ApplyBackdropOpacity();
         _notifyIcon = CreateNotifyIcon();
-        Loaded += (_, _) => ClampIntoWorkArea();
+        Loaded += (_, _) => { ClampIntoWorkArea(); UpdateResetOverlayVisibility(); };
     }
 
     // --- Window lifecycle ---------------------------------------------------
@@ -211,6 +213,25 @@ public partial class MainWindow : Window
 
     // --- Opacity ------------------------------------------------------------
 
+    private void UpdateResetOverlayVisibility()
+    {
+        SetResetOverlayVisible(ResetKind.Daily, _vm.ShowDailyResetOverlay);
+        SetResetOverlayVisible(ResetKind.Weekly, _vm.ShowWeeklyResetOverlay);
+    }
+
+    private void SetResetOverlayVisible(ResetKind kind, bool visible)
+    {
+        if (kind == ResetKind.Daily)
+        {
+            _dailyResetWindow ??= new ResetWindow(kind, _vm);
+            _dailyResetWindow.SetOverlayVisible(visible);
+        }
+        else
+        {
+            _weeklyResetWindow ??= new ResetWindow(kind, _vm);
+            _weeklyResetWindow.SetOverlayVisible(visible);
+        }
+    }
     private void OnAlertRequested(object? sender, string kind)
     {
         var file = kind == MainViewModel.AlertKindOpening
@@ -223,6 +244,18 @@ public partial class MainWindow : Window
         if (e.PropertyName == nameof(MainViewModel.OpacityPercent))
         {
             ApplyBackdropOpacity();
+            _dailyResetWindow?.SyncBackdropOpacity();
+            _weeklyResetWindow?.SyncBackdropOpacity();
+        }
+        else if (e.PropertyName == nameof(MainViewModel.IsTopMost))
+        {
+            if (_dailyResetWindow is not null) { _dailyResetWindow.Topmost = _vm.IsTopMost; }
+            if (_weeklyResetWindow is not null) { _weeklyResetWindow.Topmost = _vm.IsTopMost; }
+        }
+        else if (e.PropertyName == nameof(MainViewModel.ShowDailyResetOverlay) ||
+                 e.PropertyName == nameof(MainViewModel.ShowWeeklyResetOverlay))
+        {
+            UpdateResetOverlayVisibility();
         }
     }
 
@@ -296,6 +329,11 @@ public partial class MainWindow : Window
         return Drawing.Icon.FromHandle(bitmap.GetHicon());
     }
 }
+
+
+
+
+
 
 
 

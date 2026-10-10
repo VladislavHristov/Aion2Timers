@@ -1,22 +1,20 @@
-﻿# Progress: AION 2 Space Rift Overlay
+﻿# Progress: Aion2Timers (AION 2 Space Rift Overlay)
 
 ## DONE (verified by build/tests/runtime)
-- [x] Full WPF overlay (see projectbrief/productContext) - schedule, DST, UI, opacity,
-      drag/lock/tray, settings persistence, voice alerts with embedded MP3s
-- [x] Sounds override feature: sounds\ folder next to exe (priority over embedded
-      defaults), settings.json paths still highest priority
-- [x] Embedded defaults re-extracted on every startup (stale-extraction bug fixed)
-- [x] GitHub repo: https://github.com/VladislavHristov/Aion2Timers (pushed, main)
+- [x] Full WPF overlay: Sofia-time Space Rift schedule, DST-aware, frameless drag/lock,
+      opacity on backdrop, tray, settings JSON persistence, voice alerts (embedded MP3s,
+      sounds\ override folder next to exe, settings.json paths)
+- [x] Daily Reset + Weekly Reset overlay windows (07:00 UTC daily; Wednesday 07:00 UTC
+      weekly), mini style (132px, "Aion2" header), own positions, synced opacity/topmost,
+      show/hide checkboxes in main settings panel
+- [x] Main overlay compacted to 250px width
+- [x] GitHub repo https://github.com/VladislavHristov/Aion2Timers (branch main)
 
 ## Test Results
-- Latest run: 43/43 PASSED (build exit 0, publish exit 0)
-
-## VERIFIED AT RUNTIME
-- Published exe launches and runs; publish\sounds override folder auto-created.
+- Latest run: 58/58 PASSED (build exit 0, publish exit 0)
 
 ## NOT DONE / OPEN
 - [ ] In-game visibility over AION 2 NOT verified (user must test in Borderless Windowed)
-- [ ] No volume control for alerts (likely future ask)
-- [ ] No alert test button in settings
+- [ ] No volume control / alert test button
 - [ ] exe unsigned (SmartScreen on first run)
-- [ ] No GitHub Actions release workflow (offered to user)
+- [ ] No GitHub Actions release workflow (offered)

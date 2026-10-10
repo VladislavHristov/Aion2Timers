@@ -270,6 +270,76 @@ public sealed class MainViewModel : INotifyPropertyChanged
         return File.Exists(fallbackPath) ? fallbackPath : string.Empty;
     }
 
+    public bool ShowDailyResetOverlay
+    {
+        get => _settings.ShowDailyResetOverlay;
+        set
+        {
+            if (_settings.ShowDailyResetOverlay == value) return;
+            _settings.ShowDailyResetOverlay = value;
+            SaveAndNotify(nameof(ShowDailyResetOverlay));
+        }
+    }
+
+    public bool ShowWeeklyResetOverlay
+    {
+        get => _settings.ShowWeeklyResetOverlay;
+        set
+        {
+            if (_settings.ShowWeeklyResetOverlay == value) return;
+            _settings.ShowWeeklyResetOverlay = value;
+            SaveAndNotify(nameof(ShowWeeklyResetOverlay));
+        }
+    }
+
+    /// <summary>Saved position for a tagged secondary window ("Daily"/"Weekly").</summary>
+    public bool TryGetTaggedPosition(string tag, out double x, out double y)
+    {
+        x = 0;
+        y = 0;
+        bool has;
+        switch (tag)
+        {
+            case "Daily":
+                has = _settings.HasDailyWindowPosition;
+                x = _settings.DailyWindowX;
+                y = _settings.DailyWindowY;
+                break;
+            case "Weekly":
+                has = _settings.HasWeeklyWindowPosition;
+                x = _settings.WeeklyWindowX;
+                y = _settings.WeeklyWindowY;
+                break;
+            default:
+                return false;
+        }
+
+        return has && double.IsFinite(x) && double.IsFinite(y);
+    }
+
+    public void SaveTaggedWindowPosition(string tag, double x, double y)
+    {
+        if (!double.IsFinite(x) || !double.IsFinite(y))
+        {
+            return;
+        }
+
+        switch (tag)
+        {
+            case "Daily":
+                _settings.HasDailyWindowPosition = true;
+                _settings.DailyWindowX = x;
+                _settings.DailyWindowY = y;
+                break;
+            case "Weekly":
+                _settings.HasWeeklyWindowPosition = true;
+                _settings.WeeklyWindowX = x;
+                _settings.WeeklyWindowY = y;
+                break;
+        }
+
+        SaveSettings();
+    }
     private void SaveAndNotify(string propertyName)
     {
         SaveSettings();
@@ -290,3 +360,4 @@ public sealed class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
     }
 }
+

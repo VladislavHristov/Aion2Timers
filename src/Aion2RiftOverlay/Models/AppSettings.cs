@@ -44,7 +44,22 @@ public sealed class AppSettings
 
     /// <summary>Sound file for the opening alert. Empty = bundled default path.</summary>
     public string OpeningSoundFile { get; set; } = string.Empty;
-    public void Sanitize()
+    /// <summary>Show the Daily Reset overlay window.</summary>
+    public bool ShowDailyResetOverlay { get; set; } = true;
+
+    /// <summary>Show the Weekly Reset overlay window.</summary>
+    public bool ShowWeeklyResetOverlay { get; set; } = true;
+
+    /// <summary>Saved position of the Daily Reset window.</summary>
+    public bool HasDailyWindowPosition { get; set; }
+    public double DailyWindowX { get; set; }
+    public double DailyWindowY { get; set; }
+
+    /// <summary>Saved position of the Weekly Reset window.</summary>
+    public bool HasWeeklyWindowPosition { get; set; }
+    public double WeeklyWindowX { get; set; }
+    public double WeeklyWindowY { get; set; }
+        public void Sanitize()
     {
         OpacityPercent = Math.Clamp(double.IsFinite(OpacityPercent) ? OpacityPercent : 85, 20, 100);
         if (!double.IsFinite(WindowX) || !double.IsFinite(WindowY))
@@ -53,6 +68,20 @@ public sealed class AppSettings
             WindowY = 0;
             HasWindowPosition = false;
         }
+        if (!double.IsFinite(DailyWindowX) || !double.IsFinite(DailyWindowY))
+        {
+            DailyWindowX = 0;
+            DailyWindowY = 0;
+            HasDailyWindowPosition = false;
+        }
+        if (!double.IsFinite(WeeklyWindowX) || !double.IsFinite(WeeklyWindowY))
+        {
+            WeeklyWindowX = 0;
+            WeeklyWindowY = 0;
+            HasWeeklyWindowPosition = false;
+        }
     }
 }
+
+
 

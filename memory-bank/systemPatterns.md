@@ -44,3 +44,8 @@
 - The editor tool's old_text replacement is unreliable here; prefer delete+recreate
   via editor, or PowerShell single-line .Replace (multi-line replaces need regex
   with \s* due to line-ending differences).
+
+## USER RULES (must always be followed)
+- **Commit, push and memory-bank updates ONLY when the user explicitly asks for it.**
+  Never commit or push spontaneously, even after large feature work. Code + build +
+  tests may proceed freely; git actions and memory-bank writes are opt-in.
